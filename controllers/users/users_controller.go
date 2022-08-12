@@ -9,6 +9,7 @@ import (
 	"strconv"
 )
 
+// CreateUser Handle the request to create a new user
 func CreateUser(c *gin.Context) {
 	var user users.User
 	if err := c.ShouldBindJSON(&user); err != nil {
@@ -23,6 +24,8 @@ func CreateUser(c *gin.Context) {
 	}
 	c.JSON(http.StatusCreated, createdUser)
 }
+
+// GetUser Handle the request to get the user with the given id.
 func GetUser(c *gin.Context) {
 	userId, userErr := strconv.ParseInt(c.Param("user_id"), 10, 64)
 	if userErr != nil {

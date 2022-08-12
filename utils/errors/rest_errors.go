@@ -8,6 +8,7 @@ type RestError struct {
 	ErrorType  string `json:"error_type"`
 }
 
+// NewBadRequestError Create a new bad request error.
 func NewBadRequestError(message string) *RestError {
 	return &RestError{
 		Message:    message,
@@ -16,14 +17,16 @@ func NewBadRequestError(message string) *RestError {
 	}
 }
 
+// NewInternalServerError Create a new internal server error.
 func NewInternalServerError(message string) *RestError {
 	return &RestError{
 		Message:    message,
 		StatusCode: http.StatusInternalServerError,
-		ErrorType:  "bad_request",
+		ErrorType:  "server_error",
 	}
 }
 
+// NewNotFoundError Create a new not found error.
 func NewNotFoundError(message string) *RestError {
 	return &RestError{
 		Message:    message,

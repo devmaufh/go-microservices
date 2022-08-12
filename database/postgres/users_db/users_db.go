@@ -25,6 +25,7 @@ var (
 	dbPort     string
 )
 
+//Initialize the database connection.
 func init() {
 	err := godotenv.Load(".env")
 	if err != nil {
