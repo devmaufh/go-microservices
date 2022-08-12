@@ -1,44 +1,48 @@
 package users_db
 
 import (
-	"database/sql"
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
-	"log"
+	"github.com/joho/godotenv"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 	"os"
 )
 
 const (
-	mysql_users_db_user     = "MYSQL_USERS_DB_USER"
-	mysql_users_db_password = "MYSQL_USERS_DB_PASSWORD"
-	mysql_users_db_host     = "MYSQL_USERS_DB_HOST"
-	mysql_users_db_name     = "MYSQL_USERS_DB_NAME"
+	postgresUsersDbUser     = "POSTGRES_USERS_DB_USER"
+	postgresUsersDbPassword = "POSTGRES_USERS_DB_PASSWORD"
+	postgresUsersDbHost     = "POSTGRES_USERS_DB_HOST"
+	postgresUsersDbName     = "POSTGRES_USERS_DB_NAME"
+	postgresUsersDbPort     = "POSTGRES_USERS_DB_PORT"
 )
 
 var (
-	Client     *sql.DB
-	dbUsername = os.Getenv(mysql_users_db_user)
-	dbPassword = os.Getenv(mysql_users_db_password)
-	dbHost     = os.Getenv(mysql_users_db_host)
-	dbName     = os.Getenv(mysql_users_db_name)
+	Client     *gorm.DB
+	dbUsername string
+	dbPassword string
+	dbHost     string
+	dbName     string
+	dbPort     string
 )
 
 func init() {
-	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8",
-		dbUsername,
-		dbPassword,
-		dbHost,
-		dbName,
-	)
-
-	var err error
-	Client, err = sql.Open("postgresql", dataSourceName)
+	err := godotenv.Load(".env")
 	if err != nil {
-		panic(err)
+		panic("The .env cannot be loaded")
 	}
 
-	if err = Client.Ping(); err != nil {
-		panic(err)
+	dbUsername = os.Getenv(postgresUsersDbUser)
+	dbPassword = os.Getenv(postgresUsersDbPassword)
+	dbHost = os.Getenv(postgresUsersDbHost)
+	dbName = os.Getenv(postgresUsersDbName)
+	dbPort = os.Getenv(postgresUsersDbPort)
+
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s",
+		dbHost, dbUsername, dbPassword, dbName, dbPort)
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic("The database cannot be open.")
 	}
-	log.Println("Database connection done.")
+	Client = db
 }

@@ -2,8 +2,13 @@ package users
 
 import (
 	"fmt"
+	"github.com/devmaufh/go_books/database/postgres/users_db"
 	"github.com/devmaufh/go_books/utils/date_utils"
 	"github.com/devmaufh/go_books/utils/errors"
+)
+
+const (
+	queryInsertUser = "INSERT INTO users(first_name,last_name,email,created_at,updated_at) VALUES(?,?,?,?,?)"
 )
 
 var (
@@ -27,16 +32,8 @@ func (user *User) Get(userId int64) *errors.RestError {
 }
 
 func (user *User) Save() *errors.RestError {
-	if current := usersDB[user.Id]; current != nil {
-		if current.Email == user.Email {
-			return errors.NewBadRequestError(fmt.Sprintf("The email %s is already taken.", current.Email))
-		}
-		return errors.NewBadRequestError("The user already exists.")
-	}
-
 	user.CreatedAt = date_utils.GetNowString()
 	user.UpdatedAt = date_utils.GetNowString()
-
-	usersDB[user.Id] = user
+	users_db.Client.Raw(queryInsertUser, user.FirstName, user.LastName, user.Email, user.CreatedAt, user.UpdatedAt).Scan(&user.Id)
 	return nil
 }
