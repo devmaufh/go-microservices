@@ -5,7 +5,7 @@ import (
 )
 
 var (
-	router = gin.Default()
+	router = gin.New()
 )
 
 // StartApplication Initialize the application.
